@@ -1,0 +1,22 @@
+name: Release
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install
+      - run: bunx standard-version --release-as auto
+      - run: git push --follow-tags
+      - run: git push origin main
+      # Optional: create GitHub Release from the tag
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref }}
