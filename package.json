@@ -15,7 +15,8 @@
     "infra/"
   ],
   "dependencies": {
-    "nue-hyper": "^0.1.1"
+    "nue-hyper": "^0.1.1",
+    "nuekit": "^1.0.0-RC.4"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
