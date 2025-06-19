@@ -1,8 +1,8 @@
 ---
 title: "Building in Public: Why and How"
 date: 2025-06-17
+publishedDate: 2025-06-17
 description: "Starting the SOMB open project—what I'm doing, and why."
-tags: [meta, journey]
 ---
 
 Today, I began with the setup of a project idea of mine.
