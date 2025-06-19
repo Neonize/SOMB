@@ -8,7 +8,8 @@
     "prepare": "husky",
     "dev": "cd app && nue",
     "build": "cd app && nue build",
-    "build:infra": "bun run build --cwd infra"
+    "build:infra": "bun run build --cwd infra",
+    "new-blog": "read -p 'Blog title: ' title && date=$(date +'%Y-%m-%d') && slug=$(echo \"$title\" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-\\|-$//g') && filename=\"app/blog/${date}-${slug}.md\" && if [ -f \"$filename\" ]; then echo \"Error: File $filename already exists!\"; exit 1; fi && cat > \"$filename\" << EOF\n---\ntitle: \"$title\"\ndate: $(date +'%Y-%m-%d')\ndraft: true\ndescription: \"\"\n---\n\nEOF\necho \"Created: $filename\""
   },
   "workspaces": [
     "infra/"

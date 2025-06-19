@@ -28,4 +28,29 @@ See [LICENSE](./LICENSE) for details or [choosealicense.com](https://choosealice
 - See [ARCHITECTURE.md](./ARCHITECTURE.md) for tech details.
 - See [FUTURE_SAAS.md](./FUTURE_SAAS.md) for plans on SaaS-ification.
 
+## Creating New Blog Entries
+
+To create a new blog post, use the built-in script:
+
+```bash
+bun run new-blog
+```
+
+This will:
+
+1. Prompt you for a blog title
+2. Generate a new markdown file in `app/blog/` with the current date
+3. Create the filename using the pattern: `YYYY-MM-DD-slugified-title.md`
+4. Set up the frontmatter with `title`, `date`, `draft: true`, and empty `description`
+
+**Example:**
+
+```bash
+$ bun run new-blog
+Blog title: My Awesome New Post
+Created: app/blog/2025-06-19-my-awesome-new-post.md
+```
+
+The generated file will be ready for you to write content. The `publishedDate` field will be added automatically by the pipeline when you publish the post.
+
 ---
