@@ -25,8 +25,10 @@ See [LICENSE](./LICENSE) for details or [choosealicense.com](https://choosealice
 ## Quick Start
 
 - See [SETUP_GUIDE.md](./SETUP_GUIDE.md) to fork, build, and deploy your own version.
+- See [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md) for detailed deployment instructions.
 - See [ARCHITECTURE.md](./ARCHITECTURE.md) for tech details.
 - See [FUTURE_SAAS.md](./FUTURE_SAAS.md) for plans on SaaS-ification.
+- See [infra/README.md](./infra/README.md) for infrastructure documentation.
 
 ## Creating New Blog Entries
 
