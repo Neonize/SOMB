@@ -38,7 +38,9 @@ Kind of the same problem happends with the Route53 HostedZone. I used a new one 
 
 In addition, the DNS HostedZone gets created but is not connected, therefore the DNS Validation for the certificate will not work directly. This might break the deployment which will then rollback if you do not configure the NS entries fast enough. I think this is not well documented too.
 
-Sadly Anthropic seems to be down right now for the API which is why my AI-Developer does not want to work. At least this means more time for me to quickly finish this article.
+~~Sadly Anthropic seems to be down right now for the API which is why my AI-Developer does not want to work. At least this means more time for me to quickly finish this article.~~
+
+> Correction: The budget was empty. I got a mail later.
 
 ## Next steps
 
