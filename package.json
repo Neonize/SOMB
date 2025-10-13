@@ -16,7 +16,7 @@
   ],
   "dependencies": {
     "nue-hyper": "^0.1.1",
-    "nuekit": "^1.0.0-RC.4"
+    "nuekit": "^2.0.0-beta.2"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
