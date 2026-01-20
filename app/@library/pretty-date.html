@@ -1,0 +1,27 @@
+<!html lib>
+<time @name="pretty-date" :datetime="date">
+  { formatDate(date) }
+</time>
+
+<script>
+  // Format date in a human-readable format (e.g., "June 17, 2025")
+  export default {
+    formatDate(date) {
+      if (!date) return 'Draft'
+
+      const d = new Date(date)
+      if (isNaN(d.getTime())) return 'Draft'
+
+      const months = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+      ]
+
+      const month = months[d.getMonth()]
+      const day = d.getDate()
+      const year = d.getFullYear()
+
+      return `${month} ${day}, ${year}`
+    }
+  }
+</script>

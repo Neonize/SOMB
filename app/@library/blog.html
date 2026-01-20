@@ -1,0 +1,50 @@
+<!html lib>
+<!--
+  Blog component that filters out draft posts from the content collection.
+  Draft posts are identified by having `draft: true` in their frontmatter.
+-->
+<ul @name="blog-posts" class="gallery">
+  <li :for="post in filteredPosts">
+    <a :href="post.url">
+      <figure>
+        <time :datetime="post.publishedDate || post.date">
+          { prettyDate(post.publishedDate || post.date) }
+        </time>
+        <h2>{ post.title }</h2>
+        <p>{ post.description }</p>
+      </figure>
+    </a>
+  </li>
+</ul>
+
+<script>
+  export default {
+    // Filter out draft posts in constructor
+    constructor({ posts }) {
+      this.filteredPosts = posts ? posts.filter(post => !post.draft) : []
+    },
+
+    // Format date for display
+    prettyDate(date) {
+      if (!date) return ''
+
+      const d = new Date(date)
+      if (isNaN(d.getTime())) return ''
+
+      const months = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+      ]
+
+      const month = months[d.getMonth()]
+      const day = d.getDate()
+      const year = d.getFullYear()
+
+      return `${month} ${day}, ${year}`
+    }
+  }
+</script>
+
+<style>
+  @include "gallery.css"
+</style>

@@ -21,6 +21,7 @@ og: /img/og.jpg
 navigation:
   header:
     - SOMB: /
+    - Blog: /blog/
     - Contact: /contact/
 
   footer:

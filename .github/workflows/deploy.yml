@@ -9,7 +9,7 @@ on:
 
 permissions:
   id-token: write
-  contents: read
+  contents: write
 
 jobs:
   deploy:
@@ -26,6 +26,17 @@ jobs:
 
       - name: Install dependencies
         run: bun install
+
+      - name: Add publishedDate to newly published posts
+        run: node scripts/add-published-date.js
+
+      - name: Commit publishedDate changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add app/blog/
+          git diff --staged --quiet || git commit -m "chore: add publishedDate to newly published posts [skip ci]"
+          git push
 
       - name: Build website
         run: bun run build --production

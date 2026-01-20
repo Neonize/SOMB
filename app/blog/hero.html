@@ -1,6 +1,14 @@
 <header @name="pagehead">
   <h1>{ title }</h1>
-  <p>
-    <pretty-date :date="publishedDate" />
+  <p class="blog-meta">
+    <span class="written-date">Written: <pretty-date :date="date" /></span>
+    { publishedDate ?
+      `<span class="published-date">Published: <pretty-date :date="publishedDate" /></span>` :
+      `<span class="draft-badge">Draft</span>`
+    }
   </p>
 </header>
+
+<style>
+  @include "../@library/blog-meta.css"
+</style>

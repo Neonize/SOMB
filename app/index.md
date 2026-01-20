@@ -1,5 +1,5 @@
 ---
-include: [ gallery, motion ]
+include: [ motion ]
 content_collection: blog
 ---
 
@@ -7,4 +7,4 @@ content_collection: blog
 
 I'm [Vincent Martens](https://vmartens.de), a software engineer from Hamburg. I build this newsletter and blog combination in public and write about it.
 
-[page-list.gallery]
+[blog-posts :posts="blog"]
