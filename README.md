@@ -2,7 +2,7 @@
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/vmartens)
 
-A fully open with-infrastructure newsletter & blog engine built for clarity, rapid iteration, and SaaS-readiness. Content lives in Markdown, is published as a Nue SPA static site, and is also sent to subscribers via AWS SES.
+A fully open with-infrastructure newsletter & blog engine built for clarity, rapid iteration, and SaaS-readiness. Content lives in Markdown, is published as a static site with Nue 2, and is also sent to subscribers via AWS SES.
 
 - 🚀 Easily forkable, open codebase (one repo)
 - ☁️  AWS-native infra (CDK/TypeScript), GitHub Actions/CICD

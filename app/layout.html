@@ -1,0 +1,37 @@
+<!doctype html lib>
+
+<header>
+  <nav>
+    <a :each="item in navigation.header" href="{ item.url }"
+      aria-current="{ url == item.url ? 'page' : null }">{ item.text }</a>
+  </nav>
+</header>
+
+<footer>
+  <nav>
+    <a :each="item in navigation.footer" href="{ item.url }">
+      <img :if="item.image" src="{ item.image }" alt="{ item.alt }" width="22" height="22">
+      <span :else>{ item.text }</span>
+    </a>
+  </nav>
+</footer>
+
+<ul :is="page-list" class="gallery">
+  <li :each="post in blog">
+    <time>{ formatDate(post.date) }</time>
+    <a href="{ post.url }">
+      <h2>{ post.title }</h2>
+      <p>{ post.description }</p>
+    </a>
+  </li>
+
+  <script>
+    formatDate(date) {
+      return new Date(date).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      })
+    }
+  </script>
+</ul>

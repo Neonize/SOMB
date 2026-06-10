@@ -4,7 +4,7 @@
 
 - **AWS CDK (TypeScript):** Infra as code for DynamoDB, S3, Cloudfront, IAM, SES setup
 - **GitHub Actions:** For deploys and newsletter sends on branch pushes
-- **Nue SPA:** Blog frontend
+- **Nue 2 (nuekit):** Static site generator for the blog frontend
 - **SES:** For sending newsletters
 - **DynamoDB:** To store subscribers
 - **Markdown:** Source for all content

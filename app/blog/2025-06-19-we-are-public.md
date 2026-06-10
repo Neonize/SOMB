@@ -1,7 +1,7 @@
 ---
 title: "We are public"
 date: 2025-06-19
-draft: true
+publishedDate: 2025-06-19
 description: "You can read this blog on the web now"
 ---
 

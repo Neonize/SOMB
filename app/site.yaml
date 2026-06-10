@@ -1,42 +1,56 @@
-# yaml-language-server: $schema=https://json.schemastore.org/nuejs-site.json
-
-globals: ["@global"]
-libs: ["@library"]
-
-view_transitions: true
-native_css_nesting: true
-inline_css: true
-sections: true
-
-title_template: "SOMB / %s"
-author: Vincent Martens
-favicon: /img/favicon.jpg
-description: Snapshot of my brain
 port: 8083
 
-# OG image
-origin: https://simple-blog.nuejs.org
-og: /img/og.jpg
+meta:
+  title_template: "SOMB / %s"
+  title: Snapshot of my brain
+  description: Snapshot of my brain
+  author: Vincent Martens
+  favicon: /img/favicon.jpg
+
+site:
+  # TODO: set this to your real domain (used for RSS, sitemap and og: URLs)
+  origin: https://simple-blog.nuejs.org
+  view_transitions: true
+
+design:
+  inline_css: true
+
+collections:
+  blog:
+    include: [ blog/ ]
+    require: [ title ]
+    skip: [ draft ]
+    sort: date desc
+
+rss:
+  enabled: true
+  title: SOMB — Snapshot of my brain
+  description: Snapshot of my brain
+  collection: blog
+
+sitemap:
+  enabled: true
+  skip: [ draft ]
 
 navigation:
   header:
-    - SOMB: /
-    - Contact: /contact/
+    - text: SOMB
+      url: /
+    - text: Contact
+      url: /contact/
 
   footer:
-    - © Vincent Martens: /
+    - text: © Vincent Martens
+      url: /
 
     - image: /img/twitter.svg
       url: //x.com/vmartensHH
       alt: Twitter (X) profile
-      size: 22 x 22
 
     - image: /img/github.svg
       url: //github.com/Neonize/SOMB
       alt: Github Project
-      size: 22 x 22
 
     - image: /img/linkedin.svg
       url: //linkedin.com/in/vmartens
       alt: LinkedIn profile
-      size: 22 x 22
