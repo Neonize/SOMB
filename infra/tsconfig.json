@@ -20,8 +20,10 @@
     "inlineSources": true,
     "experimentalDecorators": true,
     "strictPropertyInitialization": false,
-    "typeRoots": [
-      "./node_modules/@types"
+    "isolatedModules": true,
+    "types": [
+      "jest",
+      "node"
     ]
   },
   "exclude": [

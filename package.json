@@ -9,18 +9,25 @@
     "dev": "cd app && nue",
     "build": "cd app && nue build",
     "build:infra": "bun run build --cwd infra",
-    "new-blog": "read -p 'Blog title: ' title && date=$(date +'%Y-%m-%d') && slug=$(echo \"$title\" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-\\|-$//g') && filename=\"app/blog/${date}-${slug}.md\" && if [ -f \"$filename\" ]; then echo \"Error: File $filename already exists!\"; exit 1; fi && cat > \"$filename\" << EOF\n---\ntitle: \"$title\"\ndate: $(date +'%Y-%m-%d')\ndraft: true\ndescription: \"\"\n---\n\nEOF\necho \"Created: $filename\""
+    "test:infra": "cd infra && bunx jest",
+    "new-post": "bun scripts/new-post.ts",
+    "new-blog": "bun scripts/new-post.ts",
+    "publish-post": "bun scripts/publish-post.ts"
   },
   "workspaces": [
     "infra/"
   ],
+  "overrides": {
+    "nuemark": "0.6.3",
+    "nue-glow": "0.2.2"
+  },
   "dependencies": {
     "nue-hyper": "^0.1.1",
     "nuekit": "^1.0.0-RC.4"
   },
   "devDependencies": {
-    "@commitlint/cli": "^19.8.1",
-    "@commitlint/config-conventional": "^19.8.1",
+    "@commitlint/cli": "^21.0.2",
+    "@commitlint/config-conventional": "^21.0.2",
     "husky": "^9.1.7",
     "standard-version": "^9.5.0"
   }
