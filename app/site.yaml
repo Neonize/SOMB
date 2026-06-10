@@ -8,8 +8,7 @@ meta:
   favicon: /img/favicon.jpg
 
 site:
-  # TODO: set this to your real domain (used for RSS, sitemap and og: URLs)
-  origin: https://simple-blog.nuejs.org
+  origin: https://blog.vmartens.de
   view_transitions: true
 
 design:
