@@ -21,6 +21,11 @@ function slugify(text: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
+// safe inside double-quoted YAML values: no line breaks, quotes escaped
+function yamlSafe(text: string): string {
+  return text.replace(/\s*[\r\n]+\s*/g, " ").replace(/"/g, '\\"');
+}
+
 function fail(message: string): never {
   console.error(`✗ ${message}`);
   process.exit(1);
@@ -60,9 +65,9 @@ if (existsSync(file)) fail(`${file} already exists.`);
 
 const template = await Bun.file(TEMPLATE).text();
 const content = template
-  .replace("{{ title }}", title.replace(/"/g, '\\"'))
+  .replace("{{ title }}", yamlSafe(title))
   .replace("{{ date }}", date)
-  .replace("{{ description }}", description.replace(/"/g, '\\"'));
+  .replace("{{ description }}", yamlSafe(description));
 
 await Bun.write(file, content);
 
