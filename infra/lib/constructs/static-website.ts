@@ -38,6 +38,26 @@ export class StaticWebsiteConstruct extends Construct {
       description: `OAC for ${config.projectName} website`,
     });
 
+    // Nue generates extensionless page URLs (/blog/my-post) but writes
+    // .html files, and S3 REST origins don't resolve directory indexes.
+    // Rewrite viewer URIs to the matching S3 object key.
+    const urlRewriteFunction = new cloudfront.Function(this, 'UrlRewriteFunction', {
+      runtime: cloudfront.FunctionRuntime.JS_2_0,
+      comment: 'Rewrite extensionless URLs and directory indexes to .html objects',
+      code: cloudfront.FunctionCode.fromInline(`
+        function handler(event) {
+          var request = event.request;
+          var uri = request.uri;
+          if (uri.endsWith('/')) {
+            request.uri = uri + 'index.html';
+          } else if (!uri.split('/').pop().includes('.')) {
+            request.uri = uri + '.html';
+          }
+          return request;
+        }
+      `),
+    });
+
     // Create CloudFront distribution
     this.distribution = new cloudfront.Distribution(this, 'Distribution', {
       defaultBehavior: {
@@ -49,6 +69,12 @@ export class StaticWebsiteConstruct extends Construct {
         cachedMethods: cloudfront.CachedMethods.CACHE_GET_HEAD,
         compress: true,
         cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
+        functionAssociations: [
+          {
+            function: urlRewriteFunction,
+            eventType: cloudfront.FunctionEventType.VIEWER_REQUEST,
+          },
+        ],
       },
       domainNames: [config.domainName, `www.${config.domainName}`],
       certificate: certificate,

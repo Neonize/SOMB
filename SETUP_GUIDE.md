@@ -108,20 +108,35 @@ Add the following secrets to your GitHub repository (Settings → Secrets and va
 Create new blog posts using the built-in script:
 
 ```bash
-bun run new-blog
+bun run new-post "My Post Title" --desc "Short teaser"
 ```
 
-This will:
+Run it without arguments to be prompted interactively. This will:
 
-1. Prompt you for a blog title
-2. Generate a new markdown file in `app/blog/` with the current date
-3. Create the filename using the pattern: `YYYY-MM-DD-slugified-title.md`
-4. Set up the frontmatter with `title`, `date`, `draft: true`, and empty `description`
+1. Generate a new markdown file in `app/blog/` with the current date
+2. Create the filename using the pattern: `YYYY-MM-DD-slugified-title.md`
+3. Fill in the frontmatter (`title`, `date`, `draft: true`, `description`) from the template in `scripts/post-template.md`
+
+Want different defaults (extra frontmatter fields, a content skeleton)? Edit `scripts/post-template.md` — every new post starts from it.
+
+Preview your post locally while writing:
+
+```bash
+bun run dev
+```
 
 ## 7. Publishing Content
 
 1. Write your content in the generated markdown file
-2. When ready to publish, remove `draft: true` from the frontmatter
+2. When ready, publish the draft:
+
+```bash
+bun run publish-post            # pick a draft from the list
+bun run publish-post my-slug    # or publish a specific one
+```
+
+This removes `draft: true` and stamps `publishedDate` with today's date.
+
 3. Commit and push your changes
 4. GitHub Actions will automatically deploy the updated site
 
