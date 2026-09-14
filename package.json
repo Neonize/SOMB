@@ -1,5 +1,6 @@
 {
   "name": "somb",
+  "type": "module",
   "author": {
     "name": "Vincent Martens",
     "url": "https://vmartens.de"
@@ -9,8 +10,8 @@
     "dev": "cd app && nue",
     "build": "cd app && rm -rf .dist && nue build",
     "preview": "cd app && nue preview",
-    "build:infra": "bun run build --cwd infra",
-    "test:infra": "cd infra && bunx jest",
+    "build:infra": "cd infra && bun run build",
+    "test:infra": "cd infra && bun test",
     "new-post": "bun scripts/new-post.ts",
     "new-blog": "bun scripts/new-post.ts",
     "publish-post": "bun scripts/publish-post.ts"
@@ -22,8 +23,9 @@
     "nuekit": "2.0.0-beta.2"
   },
   "devDependencies": {
-    "@commitlint/cli": "^21.2.1",
-    "@commitlint/config-conventional": "^21.2.0",
+    "@commitlint/cli": "^21.2.2",
+    "@commitlint/config-conventional": "^21.2.2",
+    "gray-matter": "^4.0.3",
     "husky": "^9.1.7",
     "standard-version": "^9.5.0"
   }
