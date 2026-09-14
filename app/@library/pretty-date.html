@@ -17,9 +17,9 @@
         'July', 'August', 'September', 'October', 'November', 'December'
       ]
 
-      const month = months[d.getMonth()]
-      const day = d.getDate()
-      const year = d.getFullYear()
+      const month = months[d.getUTCMonth()]
+      const day = d.getUTCDate()
+      const year = d.getUTCFullYear()
 
       return `${month} ${day}, ${year}`
     }

@@ -5,17 +5,17 @@
  * This script detects when a blog post transitions from draft to published
  * and automatically adds the publishedDate field.
  *
- * A post is considered "newly published" if:
- * - It does NOT have `draft: true` in frontmatter
+ * A post is considered newly published if:
+ * - It is a newly added public post, or its parent revision has `draft: true`
  * - It does NOT have a `publishedDate` field
  * - It has a `date` field
  */
 
 import { readFileSync, writeFileSync, readdirSync } from 'fs'
-import { join, dirname } from 'path'
+import { join, dirname, relative } from 'path'
 import { fileURLToPath } from 'url'
 import matter from 'gray-matter'
-import { execSync } from 'child_process'
+import { execSync, execFileSync } from 'child_process'
 
 // Get the directory where this script is located
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -23,9 +23,47 @@ const BLOG_DIR = join(__dirname, '..', 'app', 'blog')
 const TODAY = new Date().toISOString().split('T')[0]
 
 /**
+ * Get the frontmatter from the parent revision of a blog post.
+ */
+function getParentFrontmatter(filePath) {
+  try {
+    const gitRoot = execSync('git rev-parse --show-toplevel', { encoding: 'utf-8' }).trim()
+    const relativePath = relative(gitRoot, filePath)
+    const parentContent = execFileSync(
+      'git',
+      ['show', `HEAD~1:${relativePath}`],
+      { encoding: 'utf-8', stdio: ['ignore', 'pipe', 'ignore'] }
+    )
+
+    return matter(parentContent).data
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Check whether a blog post was added in the current commit.
+ */
+function isNewFile(filePath) {
+  try {
+    const gitRoot = execSync('git rev-parse --show-toplevel', { encoding: 'utf-8' }).trim()
+    const relativePath = relative(gitRoot, filePath)
+    const addedFiles = execFileSync(
+      'git',
+      ['diff', '--name-only', '--diff-filter=A', 'HEAD~1', 'HEAD', '--', relativePath],
+      { encoding: 'utf-8', stdio: ['ignore', 'pipe', 'ignore'] }
+    )
+
+    return addedFiles.trim() === relativePath
+  } catch {
+    return false
+  }
+}
+
+/**
  * Check if a blog post needs a publishedDate added.
  */
-function needsPublishedDate(frontmatter) {
+function needsPublishedDate(frontmatter, parentFrontmatter, newFile) {
   // Don't add if it's still a draft
   if (frontmatter.draft === true) return false
 
@@ -33,8 +71,15 @@ function needsPublishedDate(frontmatter) {
   if (frontmatter.publishedDate) return false
 
   // Only add if it has a date field
-  return !!frontmatter.date
+  if (!frontmatter.date) return false
+
+  // Newly added public posts have no parent revision to inspect.
+  if (newFile) return true
+
+  // Existing posts need a draft-to-public transition.
+  return parentFrontmatter?.draft === true
 }
+
 
 /**
  * Add publishedDate to a blog post.
@@ -44,7 +89,10 @@ function addPublishedDate(filePath) {
     const fileContent = readFileSync(filePath, 'utf-8')
     const { data, content } = matter(fileContent)
 
-    if (needsPublishedDate(data)) {
+    const parentFrontmatter = getParentFrontmatter(filePath)
+    const newFile = isNewFile(filePath)
+
+    if (needsPublishedDate(data, parentFrontmatter, newFile)) {
       // Add publishedDate
       data.publishedDate = TODAY
 
