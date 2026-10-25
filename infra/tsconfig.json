@@ -22,7 +22,6 @@
     "strictPropertyInitialization": false,
     "isolatedModules": true,
     "types": [
-      "jest",
       "node"
     ]
   },
