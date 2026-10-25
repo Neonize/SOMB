@@ -44,10 +44,10 @@ const commitFile = (repo: string, name: string, content: string, msg: string) =>
   git(`commit -q -m "${msg}"`, repo);
 };
 
-const runScript = (repo: string) =>
-  Bun.spawnSync(["node", join(import.meta.dir, "add-published-date.js")], {
+const runScript = (repo: string, env: Record<string, string> = {}) =>
+  Bun.spawnSync(["bun", join(import.meta.dir, "add-published-date.ts")], {
     cwd: repo,
-    env: { ...cleanEnv(), SOMB_BLOG_DIR: join(repo, "app", "blog") },
+    env: { ...cleanEnv(), SOMB_BLOG_DIR: join(repo, "app", "blog"), ...env },
   });
 
 const today = new Date().toISOString().slice(0, 10);
@@ -60,8 +60,9 @@ test("draft-to-published transition stamps publishedDate", () => {
   const result = runScript(repo);
   expect(result.exitCode).toBe(0);
   const text = readFileSync(join(repo, "app", "blog", "2026-01-01-post.md"), "utf-8");
-  // gray-matter re-serializes dates; today's string comes out single-quoted.
-  expect(text).toMatch(new RegExp(`publishedDate: '?${today}'?`));
+  expect(text).toBe(
+    `---\ntitle: T\ndate: 2026-01-01\npublishedDate: ${today}\n---\n\nBody.\n`,
+  );
 });
 
 test("existing publishedDate is never overwritten", () => {
@@ -83,7 +84,9 @@ test("new public post with no draft phase gets stamped", () => {
   const result = runScript(repo);
   expect(result.exitCode).toBe(0);
   const text = readFileSync(join(repo, "app", "blog", "2026-01-03-post.md"), "utf-8");
-  expect(text).toMatch(new RegExp(`publishedDate: '?${today}'?`));
+  expect(text).toBe(
+    `---\ntitle: T\ndate: 2026-01-03\npublishedDate: ${today}\n---\n\nBody.\n`,
+  );
 });
 
 test("body draft: true does not block or trigger stamping", () => {
@@ -94,6 +97,42 @@ test("body draft: true does not block or trigger stamping", () => {
   const result = runScript(repo);
   expect(result.exitCode).toBe(0);
   const text = readFileSync(join(repo, "app", "blog", "2026-01-04-post.md"), "utf-8");
-  expect(text).toMatch(new RegExp(`publishedDate: '?${today}'?`));
-  expect(text).toContain("Some docs say draft: true here.");
+  expect(text).toBe(
+    `---\ntitle: T\ndate: 2026-01-04\npublishedDate: ${today}\n---\n\nSome docs say draft: true here.\n`,
+  );
+});
+
+test("multi-commit push: SOMB_BASE_SHA reaches past the last commit", () => {
+  const repo = makeRepo();
+  commitFile(repo, "2026-02-01-post.md", "---\ntitle: T\ndate: 2026-02-01\ndraft: true\n---\n\nBody.\n", "draft");
+  const baseSha = git("rev-parse HEAD", repo).trim();
+  // Commit A: publish (draft removed, no publishedDate yet).
+  commitFile(repo, "2026-02-01-post.md", "---\ntitle: T\ndate: 2026-02-01\n---\n\nBody.\n", "publish");
+  // Commit B: unrelated change that is HEAD.
+  writeFileSync(join(repo, "README.md"), "hello\n");
+  git("add .", repo);
+  git('commit -q -m "unrelated"', repo);
+
+  const result = runScript(repo, { SOMB_BASE_SHA: baseSha });
+  expect(result.exitCode).toBe(0);
+  const text = readFileSync(join(repo, "app", "blog", "2026-02-01-post.md"), "utf-8");
+  expect(text).toBe(
+    `---\ntitle: T\ndate: 2026-02-01\npublishedDate: ${today}\n---\n\nBody.\n`,
+  );
+});
+
+test("absent SOMB_BASE_SHA falls back to HEAD~1 only", () => {
+  const repo = makeRepo();
+  commitFile(repo, "2026-03-01-post.md", "---\ntitle: T\ndate: 2026-03-01\ndraft: true\n---\n\nBody.\n", "draft");
+  commitFile(repo, "2026-03-01-post.md", "---\ntitle: T\ndate: 2026-03-01\n---\n\nBody.\n", "publish");
+  // Commit B: unrelated change that is HEAD.
+  writeFileSync(join(repo, "README.md"), "hello\n");
+  git("add .", repo);
+  git('commit -q -m "unrelated"', repo);
+
+  const before = readFileSync(join(repo, "app", "blog", "2026-03-01-post.md"));
+  const result = runScript(repo);
+  expect(result.exitCode).toBe(0);
+  const after = readFileSync(join(repo, "app", "blog", "2026-03-01-post.md"));
+  expect(Buffer.compare(before, after)).toBe(0);
 });

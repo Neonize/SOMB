@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 /**
  * Add publishedDate to newly published blog posts.
  *
@@ -11,27 +11,34 @@
  * - It has a `date` field
  */
 
-import { readFileSync, writeFileSync, readdirSync } from 'fs'
-import { join, dirname, relative } from 'path'
-import { fileURLToPath } from 'url'
+import { readFileSync, writeFileSync, readdirSync } from 'node:fs'
+import { join, dirname, relative } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import matter from 'gray-matter'
-import { execSync, execFileSync } from 'child_process'
+import { execSync, execFileSync } from 'node:child_process'
+import { stampDocument } from './lib/post-frontmatter'
 
 // Get the directory where this script is located
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const BLOG_DIR = process.env.SOMB_BLOG_DIR || join(__dirname, '..', 'app', 'blog')
 const TODAY = new Date().toISOString().split('T')[0]
 
+// Diff base: the SHA the push started from (github.event.before), falling
+// back to HEAD~1 when absent/invalid (single-commit push, workflow_dispatch).
+const before = process.env.SOMB_BASE_SHA ?? ''
+const isSha = /^[0-9a-f]{40}$/.test(before) && !/^0+$/.test(before)
+const base = isSha ? before : 'HEAD~1'
+
 /**
  * Get the frontmatter from the parent revision of a blog post.
  */
-function getParentFrontmatter(filePath) {
+function getParentFrontmatter(filePath: string) {
   try {
     const gitRoot = execSync('git rev-parse --show-toplevel', { encoding: 'utf-8' }).trim()
     const relativePath = relative(gitRoot, filePath)
     const parentContent = execFileSync(
       'git',
-      ['show', `HEAD~1:${relativePath}`],
+      ['show', `${base}:${relativePath}`],
       { encoding: 'utf-8', stdio: ['ignore', 'pipe', 'ignore'] }
     )
 
@@ -42,15 +49,15 @@ function getParentFrontmatter(filePath) {
 }
 
 /**
- * Check whether a blog post was added in the current commit.
+ * Check whether a blog post was added in the current push.
  */
-function isNewFile(filePath) {
+function isNewFile(filePath: string) {
   try {
     const gitRoot = execSync('git rev-parse --show-toplevel', { encoding: 'utf-8' }).trim()
     const relativePath = relative(gitRoot, filePath)
     const addedFiles = execFileSync(
       'git',
-      ['diff', '--name-only', '--diff-filter=A', 'HEAD~1', 'HEAD', '--', relativePath],
+      ['diff', '--name-only', '--diff-filter=A', base, 'HEAD', '--', relativePath],
       { encoding: 'utf-8', stdio: ['ignore', 'pipe', 'ignore'] }
     )
 
@@ -63,7 +70,11 @@ function isNewFile(filePath) {
 /**
  * Check if a blog post needs a publishedDate added.
  */
-function needsPublishedDate(frontmatter, parentFrontmatter, newFile) {
+function needsPublishedDate(
+  frontmatter: Record<string, unknown>,
+  parentFrontmatter: Record<string, unknown> | null,
+  newFile: boolean,
+) {
   // Don't add if it's still a draft
   if (frontmatter.draft === true) return false
 
@@ -84,35 +95,34 @@ function needsPublishedDate(frontmatter, parentFrontmatter, newFile) {
 /**
  * Add publishedDate to a blog post.
  */
-function addPublishedDate(filePath) {
+function addPublishedDate(filePath: string) {
   try {
     const fileContent = readFileSync(filePath, 'utf-8')
-    const { data, content } = matter(fileContent)
+    const { data } = matter(fileContent)
 
     const parentFrontmatter = getParentFrontmatter(filePath)
     const newFile = isNewFile(filePath)
 
     if (needsPublishedDate(data, parentFrontmatter, newFile)) {
-      // Add publishedDate
-      data.publishedDate = TODAY
-
-      // Reconstruct the file with updated frontmatter
-      const newContent = matter.stringify(content, data)
-
-      writeFileSync(filePath, newContent, 'utf-8')
-      console.log(`✓ Added publishedDate: ${filePath}`)
-      return true
+      // Surgical stamp: inserts publishedDate, never rewrites the block.
+      const stamped = stampDocument(fileContent, TODAY, { overwrite: false })
+      if (stamped !== null) {
+        writeFileSync(filePath, stamped, 'utf-8')
+        console.log(`✓ Added publishedDate: ${filePath}`)
+        return true
+      }
+      return false
     }
 
     return false
   } catch (error) {
-    console.error(`✗ Error processing ${filePath}:`, error.message)
+    console.error(`✗ Error processing ${filePath}:`, (error as Error).message)
     return false
   }
 }
 
 /**
- * Get blog files changed in the latest commit.
+ * Get blog files changed in the push.
  */
 function getChangedBlogFiles() {
   // Try to get files from git diff (for GitHub Actions)
@@ -120,9 +130,9 @@ function getChangedBlogFiles() {
     // Get the git root directory
     const gitRoot = execSync('git rev-parse --show-toplevel', { encoding: 'utf-8' }).trim()
 
-    // Get all changed blog files in the latest commit
+    // Get all changed blog files since the push's base commit
     const changedFiles = execSync(
-      'git diff --name-only HEAD~1 HEAD',
+      `git diff --name-only ${base} HEAD`,
       { encoding: 'utf-8' }
     )
       .trim()
@@ -138,7 +148,7 @@ function getChangedBlogFiles() {
 
     // Fallback: check all blog files if no git history available
     console.log('No git changes detected, checking all blog files...')
-  } catch (error) {
+  } catch {
     console.log('Git detection failed, checking all blog files...')
   }
 
@@ -173,5 +183,6 @@ function main() {
 
   console.log(`\n✅ Done: ${updatedCount} post(s) updated`)
 }
+
 
 main()

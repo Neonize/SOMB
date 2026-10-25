@@ -2,6 +2,7 @@ import { test, expect, beforeAll, beforeEach, afterAll } from "bun:test";
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { stampDocument } from "./lib/post-frontmatter";
 
 let dir: string;
 const run = (args: string[]) =>
@@ -79,4 +80,15 @@ test("body text is never treated as frontmatter", () => {
   expect(result.exitCode).not.toBe(0);
   expect(result.stderr.toString()).toMatch(/No draft matches/);
   expect(readFileSync(path, "utf-8")).toBe(content);
+});
+
+test("CI stampDocument converges byte-for-byte with publish-post", () => {
+  const result = run(["my-draft"]);
+  expect(result.exitCode).toBe(0);
+
+  const today = new Date().toISOString().slice(0, 10);
+  const local = readFileSync(join(dir, "2026-01-01-my-draft.md"), "utf-8");
+  const ci = stampDocument(draft("2026-01-01-my-draft.md"), today, { overwrite: false });
+  expect(ci).not.toBeNull();
+  expect(local).toBe(ci);
 });
