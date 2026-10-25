@@ -2,20 +2,20 @@
 
 ## Core Technologies
 
-- **AWS CDK (TypeScript):** Infra as code for DynamoDB, S3, Cloudfront, IAM, SES setup
-- **GitHub Actions:** For deploys and newsletter sends on branch pushes
+- **AWS CDK (TypeScript):** Infra as code for S3, CloudFront, Route53, ACM, IAM (planned: DynamoDB + SES)
+- **GitHub Actions:** For deploys on branch pushes (planned: newsletter sends)
 - **Nue 2 (nuekit):** Static site generator for the blog frontend
-- **SES:** For sending newsletters
-- **DynamoDB:** To store subscribers
+- **SES (planned):** For sending newsletters
+- **DynamoDB (planned):** To store subscribers
 - **Markdown:** Source for all content
 
 ## High-Level Flow
 
 1. Write content in Markdown in `app/blog/`
-2. Git push triggers send to subscribers (GitHub Action)
+2. Git push triggers a website deploy (GitHub Action); newsletter send on push (planned)
 3. Sent post gets updated (`draft: false` gets removed and `publishedDate` gets added)
 4. Website gets build and served from S3/CloudFront
-5. Subscribers managed via DynamoDB
+5. Subscribers managed via DynamoDB (planned)
 
 ## Design Principles
 

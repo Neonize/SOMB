@@ -33,7 +33,7 @@ bun run new-blog     # Interactive script to create new blog post
 bun run build:infra  # Build infrastructure TypeScript (runs in infra/ directory)
 cd infra && bun run cdk deploy    # Deploy AWS infrastructure
 cd infra && bun run cdk destroy   # Destroy AWS infrastructure
-cd infra && bun test              # Run infrastructure tests (Jest)
+cd infra && bun test              # Run infrastructure tests (Bun's built-in runner)
 ```
 
 ## Content Management

@@ -2,11 +2,11 @@
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/vmartens)
 
-A fully open with-infrastructure newsletter & blog engine built for clarity, rapid iteration, and SaaS-readiness. Content lives in Markdown, is published as a static site with Nue 2, and is also sent to subscribers via AWS SES.
+A fully open with-infrastructure newsletter & blog engine built for clarity, rapid iteration, and SaaS-readiness. Content lives in Markdown and is published as a static site with Nue 2. Newsletter delivery via AWS SES is planned (see ROADMAP.md) — today SOMB is a blog engine with AWS-native infrastructure.
 
 - 🚀 Easily forkable, open codebase (one repo)
 - ☁️  AWS-native infra (CDK/TypeScript), GitHub Actions/CICD
-- ✉️  Write in Markdown; email + blog from the same file
+- ✉️  Write in Markdown; email + blog from the same file (newsletter delivery planned)
 - 🤝 Roadmap includes multi-user/SaaS, but MVP is solo-tenant
 
 **I build this in public and blog about every design choice.**
