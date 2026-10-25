@@ -10,7 +10,7 @@ import { readdirSync } from "node:fs";
 import { join, dirname, basename } from "node:path";
 
 const ROOT = join(dirname(Bun.main), "..");
-const BLOG_DIR = join(ROOT, "app", "blog");
+const BLOG_DIR = process.env.SOMB_BLOG_DIR ?? join(ROOT, "app", "blog");
 
 function fail(message: string): never {
   console.error(`✗ ${message}`);
