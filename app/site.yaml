@@ -17,7 +17,7 @@ design:
 collections:
   blog:
     include: [ blog/ ]
-    require: [ title ]
+    require: [ title, date ]
     skip: [ draft ]
     sort: date desc
 

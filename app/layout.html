@@ -18,20 +18,10 @@
 
 <ul :is="page-list" class="gallery">
   <li :each="post in blog">
-    <time>{ formatDate(post.date) }</time>
+    <pretty-date :date="post.publishedDate || post.date" />
     <a href="{ post.url }">
       <h2>{ post.title }</h2>
       <p>{ post.description }</p>
     </a>
   </li>
-
-  <script>
-    formatDate(date) {
-      return new Date(date).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      })
-    }
-  </script>
 </ul>

@@ -2,17 +2,7 @@
 
 <header :is="pagehead">
   <h1>{ title }</h1>
-  <p>
-    <time>{ formatDate(publishedDate || date) }</time>
+  <p :if="publishedDate || date">
+    <pretty-date :date="publishedDate || date" />
   </p>
-
-  <script>
-    formatDate(date) {
-      return new Date(date).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      })
-    }
-  </script>
 </header>

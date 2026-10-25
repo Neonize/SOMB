@@ -8,7 +8,7 @@
   "scripts": {
     "prepare": "husky",
     "dev": "cd app && nue",
-    "build": "cd app && rm -rf .dist && nue build",
+    "build": "cd app && rm -rf .dist && nue build && bun ../scripts/sitemap-lastmod.ts",
     "preview": "cd app && nue preview",
     "build:infra": "cd infra && bun run build",
     "test:infra": "cd infra && bun test",
