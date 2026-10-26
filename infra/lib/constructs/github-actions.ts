@@ -38,12 +38,10 @@ export class GitHubActionsConstruct extends Construct {
     this.role = new iam.Role(this, 'GitHubActionsRole', {
       roleName: getResourceName(config, 'github-actions-role'),
       assumedBy: new iam.WebIdentityPrincipal(oidcProvider.openIdConnectProviderArn, {
-        StringEquals: {
-          'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com',
-        },
-        StringLike: {
-          'token.actions.githubusercontent.com:sub': `repo:${config.githubRepo}:*`,
-        },
+      StringEquals: {
+        'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com',
+        'token.actions.githubusercontent.com:sub': `repo:${config.githubRepo}:ref:refs/heads/main`,
+      },
       }),
       description: `Role for GitHub Actions to deploy ${config.projectName}`,
       maxSessionDuration: cdk.Duration.hours(1),

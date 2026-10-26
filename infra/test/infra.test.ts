@@ -32,14 +32,14 @@ test("website bucket blocks all public access", () => {
   });
 });
 
-test("website bucket is deleted with the stack", () => {
+test("website bucket is retained when the stack is deleted", () => {
   const buckets = resourcesOf(template, "AWS::S3::Bucket").filter(
     (r) => r.Properties.BucketName === "sombtest-prod-website",
   );
   expect(buckets).toHaveLength(1);
-  expect(buckets[0].DeletionPolicy).toBe("Delete");
+  expect(buckets[0].DeletionPolicy).toBe("Retain");
   if (buckets[0].UpdateReplacePolicy) {
-    expect(buckets[0].UpdateReplacePolicy).toBe("Delete");
+    expect(buckets[0].UpdateReplacePolicy).toBe("Retain");
   }
 });
 
@@ -51,8 +51,8 @@ test("exactly one IAM role trusts the repo's GitHub OIDC subject", () => {
 
   const doc = JSON.stringify(roles[0].Properties.AssumeRolePolicyDocument);
   expect(doc).toContain("token.actions.githubusercontent.com:sub");
-  expect(doc).toContain("repo:testowner/testrepo:*");
-  expect(doc).toContain("StringLike");
+  expect(doc).toContain("repo:testowner/testrepo:ref:refs/heads/main");
+  expect(doc).not.toContain("StringLike");
 });
 
 test("distribution serves index.html as root object", () => {
@@ -63,7 +63,7 @@ test("distribution serves index.html as root object", () => {
   });
 });
 
-test("404 and 403 map to /index.html with status 200", () => {
+test("404 and 403 map to /404.html with status 404", () => {
   const distributions = resourcesOf(template, "AWS::CloudFront::Distribution");
   expect(distributions).toHaveLength(1);
 
@@ -72,12 +72,12 @@ test("404 and 403 map to /index.html with status 200", () => {
   };
   const byStatus = new Map(config.CustomErrorResponses.map((e) => [e.ErrorCode, e]));
   expect(byStatus.get(404)).toMatchObject({
-    ResponsePagePath: "/index.html",
-    ResponseCode: 200,
+    ResponsePagePath: "/404.html",
+    ResponseCode: 404,
   });
   expect(byStatus.get(403)).toMatchObject({
-    ResponsePagePath: "/index.html",
-    ResponseCode: 200,
+    ResponsePagePath: "/404.html",
+    ResponseCode: 404,
   });
 });
 

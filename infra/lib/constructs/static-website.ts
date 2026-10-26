@@ -27,8 +27,7 @@ export class StaticWebsiteConstruct extends Construct {
     this.bucket = new s3.Bucket(this, 'WebsiteBucket', {
       bucketName: getResourceName(config, 'website'),
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
-      removalPolicy: cdk.RemovalPolicy.DESTROY, // For development - change to RETAIN for production
-      autoDeleteObjects: true, // For development - remove for production
+      removalPolicy: cdk.RemovalPolicy.RETAIN,
       versioned: false,
       encryption: s3.BucketEncryption.S3_MANAGED,
     });
@@ -82,15 +81,15 @@ export class StaticWebsiteConstruct extends Construct {
       errorResponses: [
         {
           httpStatus: 404,
-          responseHttpStatus: 200,
-          responsePagePath: '/index.html',
-          ttl: cdk.Duration.minutes(30),
+          responseHttpStatus: 404,
+          responsePagePath: '/404.html',
+          ttl: cdk.Duration.minutes(5),
         },
         {
           httpStatus: 403,
-          responseHttpStatus: 200,
-          responsePagePath: '/index.html',
-          ttl: cdk.Duration.minutes(30),
+          responseHttpStatus: 404,
+          responsePagePath: '/404.html',
+          ttl: cdk.Duration.minutes(5),
         },
       ],
       defaultRootObject: 'index.html',

@@ -161,6 +161,22 @@ This removes `draft: true` and stamps `publishedDate` with today's date.
 - Ensure your domain's DNS is pointing to Route53 name servers
 - Certificate validation can take several minutes
 
+### GitHub Actions OIDC provider
+
+The deploy role imports an existing GitHub OIDC provider
+(`token.actions.githubusercontent.com`) in your AWS account. On a fresh AWS
+account where you have never used GitHub Actions OIDC, create it once
+before the first `cdk deploy`:
+
+- Either deploy any workflow with `permissions: id-token: write` once and
+  let AWS record the provider,
+- or create it in the IAM console ("Identity providers" → "Add provider" →
+  Provider URL `https://token.actions.githubusercontent.com`, Audience
+  `sts.amazonaws.com`).
+
+Symptom if missing: the deploy fails creating `GitHubActionsRole` with
+"Invalid Principal in Policy" / unknown OIDC provider ARN.
+
 For detailed infrastructure information, see [infra/README.md](./infra/README.md).
 
 ---
