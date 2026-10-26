@@ -19,7 +19,7 @@ import { execSync, execFileSync } from 'child_process'
 
 // Get the directory where this script is located
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const BLOG_DIR = join(__dirname, '..', 'app', 'blog')
+const BLOG_DIR = process.env.SOMB_BLOG_DIR || join(__dirname, '..', 'app', 'blog')
 const TODAY = new Date().toISOString().split('T')[0]
 
 /**

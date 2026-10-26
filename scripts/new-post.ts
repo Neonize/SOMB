@@ -11,7 +11,7 @@ import { existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 
 const ROOT = join(dirname(Bun.main), "..");
-const BLOG_DIR = join(ROOT, "app", "blog");
+const BLOG_DIR = process.env.SOMB_BLOG_DIR ?? join(ROOT, "app", "blog");
 const TEMPLATE = join(ROOT, "scripts", "post-template.md");
 
 function slugify(text: string): string {
