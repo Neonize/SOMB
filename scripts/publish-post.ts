@@ -8,6 +8,7 @@
  */
 import { readdirSync } from "node:fs";
 import { join, dirname, basename } from "node:path";
+import { getFrontmatter, stampDocument } from "./lib/post-frontmatter";
 
 const ROOT = join(dirname(Bun.main), "..");
 const BLOG_DIR = process.env.SOMB_BLOG_DIR ?? join(ROOT, "app", "blog");
@@ -17,11 +18,8 @@ function fail(message: string): never {
   process.exit(1);
 }
 
-// leading YAML frontmatter block, so body content (e.g. code examples
-// mentioning "draft: true") is never matched or modified
-function getFrontmatter(text: string): string {
-  return text.match(/^---\r?\n[\s\S]*?\r?\n---/)?.[0] ?? "";
-}
+// Draft detection and stamping live in ./lib/post-frontmatter
+// (shared with the CI script); body content is never matched or modified.
 
 const drafts: string[] = [];
 for (const name of readdirSync(BLOG_DIR)) {
@@ -55,17 +53,9 @@ const path = join(BLOG_DIR, file);
 const today = new Date().toISOString().slice(0, 10);
 const text = await Bun.file(path).text();
 
-let fm = getFrontmatter(text);
-if (!fm) fail(`${file} has no frontmatter block.`);
-
-fm = fm.replace(/^draft:\s*true\s*\n/m, "");
-if (/^publishedDate:/m.test(fm)) {
-  fm = fm.replace(/^publishedDate:.*$/m, `publishedDate: ${today}`);
-} else {
-  fm = fm.replace(/^(date:.*)$/m, `$1\npublishedDate: ${today}`);
-}
-
-await Bun.write(path, fm + text.slice(getFrontmatter(text).length));
+const stamped = stampDocument(text, today, { overwrite: true });
+if (stamped === null) fail(`${file} has no frontmatter block or could not be stamped.`);
+await Bun.write(path, stamped);
 
 console.log(`✓ Published ${basename(file)} (publishedDate: ${today})`);
 console.log("");
